@@ -1,0 +1,7 @@
+#demo,
+#demo svg {
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  background-color: rgba(64, 64, 64, 1.0);
+}
