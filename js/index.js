@@ -32,16 +32,16 @@
       subDocs: [{
         name: "Football"
       }, {
-        name: "College",
+        name: "Training",
         target: [0]
       }, {
-        name: "Golfing",
+        name: "Coaching",
         target: [0]
       }, {
-        name: "Time",
+        name: "Programming",
         target: [0]
       }, {
-        name: "Socialising",
+        name: "Physiotherapy",
         target: [0]
       }]
     }, {
@@ -80,10 +80,11 @@
     }];
 
     var links = [];
+    var isInner = false;
     var nodes2 = nodes.valueOf();
-    calculateEverything(d3, nodes, nodes2, links, el);
+    calculateEverything(nodes, nodes2, links, isInner);
 
-    function calculateEverything(d3, nodes, nodes2, links, el) {
+    function calculateEverything(nodes, nodes2, links, isInner) {
       console.log('Going to Calculate everything!!');
       var w = screen.width,
           h = screen.height;
@@ -116,21 +117,46 @@
           .data(links).enter().append('line')
           .attr('stroke', palette.white);
 
+      console.log(links);
+
       var node = myChart.selectAll('circle')
           .data(nodes2).enter()
           .append('g')
           .call(force.drag)
           .on('dblclick', function () {
-            console.log(d3.select(this).text());
-            var nodeName = d3.select(this).text()
-            var nodeFound = false;
-            for (i = 0; i <= nodes.length && nodeFound === false; i++) {
-              if (nodes[i].name === nodeName) {
-                nodeFound = false;
-                nodes2 = nodes[i].subDocs;
-                links.pop()
-                calculateEverything(d3,nodes,nodes2,links, el);
-                console.log(nodes2);
+            if ( isInner === false) {
+              console.log(d3.select(this).text());
+              var nodeName = d3.select(this).text();
+              var nodeFound = false;
+              for (i = 0; i <= nodes2.length && nodeFound === false; i++) {
+                console.log(i);
+                if (nodes2[i].name === nodeName) {
+                  nodeFound = true;
+                  nodes2 = nodes2[i].subDocs.valueOf();
+                  myChart.remove();
+                  while (links.length > 0) {
+                    links.pop();
+                  }
+                  console.log(links);
+                  d3.select('svg').remove();
+                  isInner = true;
+                  calculateEverything(nodes, nodes2, links, isInner);
+                  console.log(nodes2);
+                }
+              }
+            }
+            else {
+              var nodeName = d3.select(this).text();
+              if (nodeName === nodes2[0].name) {
+                nodes2 = nodes.valueOf();
+                myChart.remove();
+                while (links.length > 0) {
+                  links.pop();
+                }
+                d3.select('svg').remove();
+                isInner = false;
+                calculateEverything(nodes, nodes2, links, isInner);
+                console.log('InnerDoc Console Log ' + nodes2);
               }
             }
 
