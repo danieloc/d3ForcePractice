@@ -4,6 +4,8 @@
 
     var circleWidth = 30;
 
+    //This is the SCSS colours that I can choose from.
+
     var palette = {
       "lightgray": "#819090",
       "gray": "#708284",
@@ -24,6 +26,8 @@
       "yellowgreen": "#738A05"
     }
 
+    //This is the data that will be returned from the store
+
     var nodes = [{
       name: "Daniel"
     }, {
@@ -38,7 +42,7 @@
         name: "Coaching",
         target: [0]
       }, {
-        name: "Programming",
+        name: "Health Programming",
         target: [0]
       }, {
         name: "Physiotherapy",
@@ -50,47 +54,93 @@
       subDocs: [{
         name: "FYP"
       }, {
-        name: "College",
+        name: "D3",
         target: [0]
       }, {
-        name: "Golfing",
+        name: "REACT",
         target: [0]
       }, {
-        name: "Time",
+        name: "FLUX",
         target: [0]
       }, {
-        name: "Socialising",
+        name: "MongoDB",
         target: [0]
       }]
     }, {
       name: "College",
-      target: [0]
-    }, {
-      name: "Golfing",
-      target: [0]
-    }, {
-      name: "Time",
-      target: [0]
+      target: [0],
+      subDocs: [{
+        name: "College"
+      }, {
+        name: "Group work",
+        target: [0]
+      }, {
+        name: "Meeting",
+        target: [0]
+      }, {
+        name: "CSIS",
+        target: [0]
+      }, {
+        name: "CS4023",
+        target: [0]
+      }]
     }, {
       name: "Socialising",
-      target: [0]
+      target: [0],
+      subDocs: [{
+        name: "Socialising"
+      }, {
+        name: "Football",
+        target: [0]
+      }, {
+        name: "Drinking",
+        target: [0]
+      }, {
+        name: "Gym",
+        target: [0]
+      }, {
+        name: "Soccar",
+        target: [0]
+      }]
     }, {
       name: "Friends",
-      target: [0]
+      target: [0],
+      subDocs: [{
+        name: "Friends"
+      }, {
+        name: "Kev",
+        target: [0]
+      }, {
+        name: "Ailish",
+        target: [0]
+      }, {
+        name: "Sean",
+        target: [0]
+      }, {
+        name: "Darragh",
+        target: [0]
+      }]
     }];
 
-    var links = [];
     var isInner = false;
-    var nodes2 = nodes.valueOf();
-    calculateEverything(nodes, nodes2, links, isInner);
 
-    function calculateEverything(nodes, nodes2, links, isInner) {
+    //Nodes2 is used as the data that is being displayed.
+
+    var nodes2 = nodes.valueOf();
+    calculateEverything(nodes, nodes2, isInner);
+
+    function calculateEverything(nodes, nodes2, isInner) {
+      var links = [];
       console.log('Going to Calculate everything!!');
       var w = screen.width,
           h = screen.height;
 
+
+      //For every dataset,
       for (var i = 0; i < nodes2.length; i++) {
+        //If the datahas a "target" value
         if (nodes2[i].target !== undefined) {
+          //Push it onto the links
           for (var x = 0; x < nodes2[i].target.length; x++) {
             links.push({
               source: nodes2[i],
@@ -100,36 +150,35 @@
         }
       }
 
+      //Append the svg image to the d3 element.
       var myChart = d3.select(el)
           .append('svg')
           .attr('width', w)
           .attr('height', h)
 
+      //Apply d3 force
       var force = d3.layout.force()
           .nodes(nodes2)
           .links([])
           .gravity(0.08)
-          .charge(-1000)
+          .charge(-2000)
           .size([w, h]);
 
 
+      //Add visable lines to the data links
       var link = myChart.selectAll('line')
           .data(links).enter().append('line')
           .attr('stroke', palette.white);
-
-      console.log(links);
 
       var node = myChart.selectAll('circle')
           .data(nodes2).enter()
           .append('g')
           .call(force.drag)
           .on('dblclick', function () {
+            var nodeName = d3.select(this).text();
             if ( isInner === false) {
-              console.log(d3.select(this).text());
-              var nodeName = d3.select(this).text();
               var nodeFound = false;
               for (i = 0; i <= nodes2.length && nodeFound === false; i++) {
-                console.log(i);
                 if (nodes2[i].name === nodeName) {
                   nodeFound = true;
                   nodes2 = nodes2[i].subDocs.valueOf();
@@ -137,16 +186,13 @@
                   while (links.length > 0) {
                     links.pop();
                   }
-                  console.log(links);
                   d3.select('svg').remove();
                   isInner = true;
-                  calculateEverything(nodes, nodes2, links, isInner);
-                  console.log(nodes2);
+                  calculateEverything(nodes, nodes2, isInner);
                 }
               }
             }
             else {
-              var nodeName = d3.select(this).text();
               if (nodeName === nodes2[0].name) {
                 nodes2 = nodes.valueOf();
                 myChart.remove();
@@ -155,8 +201,7 @@
                 }
                 d3.select('svg').remove();
                 isInner = false;
-                calculateEverything(nodes, nodes2, links, isInner);
-                console.log('InnerDoc Console Log ' + nodes2);
+                calculateEverything(nodes, nodes2, isInner);
               }
             }
 
@@ -186,12 +231,6 @@
 
 
       node.append('circle')
-          .attr('cx', function (d) {
-            return d.x;
-          })
-          .attr('cy', function (d) {
-            return d.y;
-          })
           .attr('r', circleWidth)
           .attr('stroke', function (d, i) {
             if (i > 0) {
