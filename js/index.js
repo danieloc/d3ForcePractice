@@ -124,12 +124,12 @@
 
     var isInner = false;
 
-    //Nodes2 is used as the data that is being displayed.
+    //displayedNodes is used as the data that is being displayed.
 
-    var nodes2 = nodes.valueOf();
-    calculateEverything(nodes, nodes2, isInner);
+    var displayedNodes = nodes.valueOf();
+    calculateEverything(nodes, displayedNodes, isInner);
 
-    function calculateEverything(nodes, nodes2, isInner) {
+    function calculateEverything(nodes, displayedNodes, isInner) {
       var links = [];
       console.log('Going to Calculate everything!!');
       var w = screen.width,
@@ -137,14 +137,14 @@
 
 
       //For every dataset,
-      for (var i = 0; i < nodes2.length; i++) {
+      for (var i = 0; i < displayedNodes.length; i++) {
         //If the datahas a "target" value
-        if (nodes2[i].target !== undefined) {
+        if (displayedNodes[i].target !== undefined) {
           //Push it onto the links
-          for (var x = 0; x < nodes2[i].target.length; x++) {
+          for (var x = 0; x < displayedNodes[i].target.length; x++) {
             links.push({
-              source: nodes2[i],
-              target: nodes2[nodes2[i].target[x]]
+              source: displayedNodes[i],
+              target: displayedNodes[displayedNodes[i].target[x]]
             })
           }
         }
@@ -158,7 +158,7 @@
 
       //Apply d3 force
       var force = d3.layout.force()
-          .nodes(nodes2)
+          .nodes(displayedNodes)
           .links([])
           .gravity(0.08)
           .charge(-2000)
@@ -171,37 +171,37 @@
           .attr('stroke', palette.white);
 
       var node = myChart.selectAll('circle')
-          .data(nodes2).enter()
+          .data(displayedNodes).enter()
           .append('g')
           .call(force.drag)
           .on('dblclick', function () {
             var nodeName = d3.select(this).text();
             if ( isInner === false) {
               var nodeFound = false;
-              for (i = 0; i <= nodes2.length && nodeFound === false; i++) {
-                if (nodes2[i].name === nodeName) {
+              for (i = 0; i <= displayedNodes.length && nodeFound === false; i++) {
+                if (displayedNodes[i].name === nodeName) {
                   nodeFound = true;
-                  nodes2 = nodes2[i].subDocs.valueOf();
+                  displayedNodes = displayedNodes[i].subDocs.valueOf();
                   myChart.remove();
                   while (links.length > 0) {
                     links.pop();
                   }
                   d3.select('svg').remove();
                   isInner = true;
-                  calculateEverything(nodes, nodes2, isInner);
+                  calculateEverything(nodes, displayedNodes, isInner);
                 }
               }
             }
             else {
-              if (nodeName === nodes2[0].name) {
-                nodes2 = nodes.valueOf();
+              if (nodeName === displayedNodes[0].name) {
+                displayedNodes = nodes.valueOf();
                 myChart.remove();
                 while (links.length > 0) {
                   links.pop();
                 }
                 d3.select('svg').remove();
                 isInner = false;
-                calculateEverything(nodes, nodes2, isInner);
+                calculateEverything(nodes, displayedNodes, isInner);
               }
             }
 
@@ -290,8 +290,8 @@
           })
 
       force.on('tick', function (e) {
-        nodes2[0].x = w / 2;
-        nodes2[0].y = h / 2;
+        displayedNodes[0].x = w / 2;
+        displayedNodes[0].y = h / 2;
         node.attr('transform', function (d, i) {
           return 'translate(' + d.x + ', ' + d.y + ')';
         })
